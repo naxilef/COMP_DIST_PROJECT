@@ -1,0 +1,44 @@
+<!DOCTYPE html>
+<html>
+<head>
+    <title>Elastic Search UI</title>
+</head>
+<body>
+    <h1>Search Amazon Reviews</h1>
+
+    <form method="GET" action="/search" onsubmit="event.preventDefault(); runSearch();">
+        <input id="query" type="text" placeholder="Search title or text..." size="40">
+        <button type="submit">Search</button>
+    </form>
+
+    <hr>
+
+    <div id="results"></div>
+
+    <script>
+        async function runSearch() {
+            const q = document.getElementById("query").value;
+            const res = await fetch(`/search?q=${q}`);
+            const data = await res.json();
+
+            const out = data.map(d => `
+                <div style="display:flex; align-items:flex-start; margin-bottom:20px">
+                    
+                    <div style="margin-right:15px;">
+                         ${d.image ? `<img src="${d.image}" width="80">` : ""}
+                    </div>
+
+                    <div>
+                        <b> ${d.title || "No title"}</b><br>
+                        ASIN: ${d.asin}<br>
+                        Rating: ${d.rating || "N/A"}<br>
+                    </div>
+                    
+                </div>
+            `).join("");
+
+            document.getElementById("results").innerHTML = out;
+        }
+    </script>
+</body>
+</html>
