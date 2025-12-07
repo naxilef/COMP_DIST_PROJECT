@@ -80,6 +80,9 @@ def search():
     
     return jsonify(hits)
 
+@app.route("/item/<asin>")
+def item_page(asin):
+    return render_template("item.html")
 
 if __name__ == '__main__':
     app.run()
