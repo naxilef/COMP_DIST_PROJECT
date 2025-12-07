@@ -17,19 +17,53 @@ def home():
 @app.route('/search')
 def search():
     query = request.args.get("q","")
+    rating = request.args.get("rating")
+    sort_price = request.args.get("price_order")
+
 
     if not query:
         return jsonify([])
     
-    body = {
-        "query": {
-            "multi_match": {
+    must_clauses = []
+    filter_clauses = []
+
+    must_clauses.append({
+        "multi_match": {
                 "query": query,
                 "fields": ["title^2", "description"]
+            }
+    })
+
+    if rating:
+        filter_clauses.append({
+            "range": {
+                "average_rating": {
+                    "gte": float(rating)
+                }
+            }
+        })
+
+    filter_clauses.append({
+        "range": {
+            "price": {"gt": 0}
+        }
+    })
+    
+    sort_clause =[]
+    if sort_price in ("asc", "desc"):
+        sort_clause.append({"price": {"order": sort_price}})
+
+    body = {
+        "query": {
+            "bool": {
+                "must": must_clauses,
+                "filter": filter_clauses
             }
         },
         "size": 20
     }
+    if sort_clause:
+        body["sort"] = sort_clause
 
     response = es.search(index=INDEX_NAME, body=body)
 
@@ -38,7 +72,8 @@ def search():
             "title": h["_source"].get("title"),
             "asin": h["_source"].get("parent_asin"),
             "rating": h["_source"].get("average_rating"),
-            "image": (h["_source"].get("images") or [{}])[0].get("thumb")
+            "image": (h["_source"].get("images") or [{}])[0].get("thumb"),
+            "price": h["_source"].get("price")
         }
         for h in response["hits"]["hits"]
     ]

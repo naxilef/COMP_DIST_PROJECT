@@ -2,24 +2,67 @@
 <html>
 <head>
     <title>Elastic Search UI</title>
+    <link rel="stylesheet" href="{{ url_for('static', filename='style.css') }}">
 </head>
 <body>
-    <h1>Search Amazon Reviews</h1>
+    <div class = "top-bar">
+        
+        <form method="GET" action="/search" onsubmit="event.preventDefault(); runSearch();" class="search-bar">
+            <input id="query" type="text" placeholder="Search title or text..." size="40">
+            <button type="submit">Search</button>
+        </form>
 
-    <form method="GET" action="/search" onsubmit="event.preventDefault(); runSearch();">
-        <input id="query" type="text" placeholder="Search title or text..." size="40">
-        <button type="submit">Search</button>
-    </form>
-
+    </div>    
     <hr>
+    <div style="display:flex; align-items:flex-start;" id="filter-area">
 
-    <div id="results"></div>
+        <div class="filter-dropbar">
+            <button id="filter-toggle" style="
+                width:100%; 
+                padding:10px; 
+                font-size:16px; 
+                cursor:pointer;
+            ">
+                Filters ▾
+            </button>
 
+            <div id="filters" class="filter-collapsed">
+
+                <label><b>Rating:</b></label><br>
+                    <select id="rating">
+                        <option value="">Any</option>
+                        <option value="5">5 ★</option>
+                        <option value="4">4 ★ & up</option>
+                        <option value="3">3 ★ & up</option>
+                    </select>
+                    <br><br>
+                <label><b>Sort by Price:</b></label><br>
+                    <select id="sort_price">
+                        <option value="">None</option>
+                        <option value="asc">Low → High</option>
+                        <option value="desc">High → Low</option>
+                    </select>
+                    <br><br>    
+            </div>
+        </div>
+
+
+        <div id="results"></div>
+    </div>
     <script>
         async function runSearch() {
             const q = document.getElementById("query").value;
-            const res = await fetch(`/search?q=${q}`);
+            const rating = document.getElementById("rating").value;
+            const price_order = document.getElementById("sort_price").value;
+
+            const params = new URLSearchParams({
+                q,rating,price_order
+            });
+
+            const res = await fetch(`/search?q=${params}`);
             const data = await res.json();
+
+            document.querySelector(".filter-dropbar").style.display = "block";
 
             const out = data.map(d => `
                 <div style="display:flex; align-items:flex-start; margin-bottom:20px">
@@ -33,12 +76,30 @@
                         ASIN: ${d.asin}<br>
                         Rating: ${d.rating || "N/A"}<br>
                     </div>
+                    <div class="price-section">
+                        ${d.price || "N/A"} $ 
+                    </div>
                     
                 </div>
             `).join("");
 
             document.getElementById("results").innerHTML = out;
         }
+        document.getElementById("filter-toggle").onclick = function() {
+            const box = document.getElementById("filters");
+            
+            if (box.classList.contains("filter-collapsed")) {
+                box.classList.remove("filter-collapsed");
+                box.classList.add("filter-expanded");
+                document.getElementById("filter-toggle").textContent = "Filters ▴";
+            } else {
+                box.classList.remove("filter-expanded");
+                box.classList.add("filter-collapsed");
+                document.getElementById("filter-toggle").textContent = "Filters ▾";
+            }
+        }
+        document.getElementById("rating").onchange = runSearch;
+        document.getElementById("sort_price").onchange = runSearch;
     </script>
 </body>
 </html>
