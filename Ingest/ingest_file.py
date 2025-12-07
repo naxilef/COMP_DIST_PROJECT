@@ -7,8 +7,8 @@ load_dotenv()
 
 ES_USER = "elastic" 
 ES_HOST = "https://localhost:9200"
-INDEX_NAME = "all-digital-music-products"
-JSON_FILE = "data\meta_Digital_Music.jsonl"
+INDEX_NAME = "video-game-products"
+JSON_FILE = r"D:\ECOLE\PREPA MASTER\FALL2025\COMP6231 - Distributed System\New folder\data\meta_Video_Games.jsonl" #put complete path to data
 
 
 es = Elasticsearch(
@@ -21,6 +21,10 @@ es = Elasticsearch(
 print(es.info())
 
 mapping = {
+  "settings": {
+      "number_of_shards": 3,
+      "number_of_replicas": 1   
+  },
   "mappings": {
     "properties": {
       "parent_asin": {"type": "keyword"},
@@ -73,48 +77,101 @@ es.indices.create(index=INDEX_NAME, body=mapping)
 
 print("Mapping created!")
 
-def load_documents(json_path):
-    with open(json_path, "r", encoding="utf-8") as f:
-        # Handle both array JSON and line-delimited JSON
-        first_char = f.read(1)
-        f.seek(0)
+def load_documents(path):
+    with open(path, "r", encoding="utf-8") as f:
+        for lineno, line in enumerate(f, start=1):
+            if not line.strip():
+                continue
 
-        if first_char == "[":
-            data = json.load(f)
-            for doc in data:
+            try:
+                doc = json.loads(line)
                 yield transform_doc(doc)
-        else:
-            for line in f:
-                if line.strip():
-                    yield transform_doc(json.loads(line))
+
+            except Exception as e:
+                print(f"[ERROR] Failed at line {lineno}: {e}")
+                continue
+
+
+
+def clean_number(value):
+    
+    try:
+        return float(value)
+    except:
+        return None
+
+def clean_list(value):
+    
+    if isinstance(value, list):
+        return " ".join([str(v) for v in value])
+    return value
+
+def clean_details(details):
+    
+    if isinstance(details, dict):
+        return details
+    return {}
+
+def clean_images(images):
+    
+    if isinstance(images, list):
+        return images
+    return []
 
 def transform_doc(doc):
-    details = doc.get("details", {})
 
-    # Keep flattened version of all details
-    doc["details"] = details  # already a dict → becomes flattened
+
+    doc["price"] = clean_number(doc.get("price"))
+    doc["average_rating"] = clean_number(doc.get("average_rating"))
+    doc["rating_number"] = clean_number(doc.get("rating_number"))
+
+    doc["description"] = clean_list(doc.get("description"))
+    doc["features"] = clean_list(doc.get("features"))
+
+    doc["details"] = clean_details(doc.get("details"))
+    doc["images"] = clean_images(doc.get("images"))
 
     return doc
 
-def bulk_ingest(file):
-    actions = (
-        {
+
+def bulk_ingest(path):
+    batch = []
+    successes = 0
+    failures = 0
+
+    print("Indexing...")
+
+    for doc in load_documents(path):
+        batch.append({
             "_index": INDEX_NAME,
             "_source": doc
-        }
-        for doc in load_documents(file)
-    )
+        })
 
-    print("Indexing documents...")
-    try:
-        helpers.bulk(es, actions, chunk_size=200)
-        print(f"Done ingesting: {file}")
+        if len(batch) == 1000:
+            ok, fail = helpers.bulk(
+                es,
+                batch,
+                raise_on_error=False,
+                raise_on_exception=False
+            )
+            successes += ok
+            failures += len(fail)
+            batch = []
 
-    except helpers.BulkIndexError as e:
-        print(f"Some documents failed in {file}. Skipping bad docs...")
-        print(f"Failed count: {len(e.errors)}")
-        pass
-    print("Done!")
+    # leftover docs
+    if batch:
+        ok, fail = helpers.bulk(
+            es,
+            batch,
+            raise_on_error=False,
+            raise_on_exception=False
+        )
+        successes += ok
+        failures += len(fail)
+
+    print(f"✓ Indexed: {successes}")
+    print(f"✗ Failed:  {failures}")
+
 
 if __name__ == "__main__":
   bulk_ingest(JSON_FILE)

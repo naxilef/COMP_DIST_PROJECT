@@ -1,5 +1,7 @@
 from elasticsearch import Elasticsearch, helpers
 import json
+INDEX_NAME = "video-game-reviews"
+
 
 # Connect to Elasticsearch
 es = Elasticsearch(
@@ -8,14 +10,23 @@ es = Elasticsearch(
     max_retries=10,
     retry_on_timeout=True
 )
+index_settings = {
+    "settings": {
+        "number_of_shards": 3,
+        "number_of_replicas": 1
+    }
+}
+
+es.indices.delete(index=INDEX_NAME, ignore=[400, 404])
+es.indices.create(index=INDEX_NAME, body=index_settings)
 
 def read_and_index():
-    with open('data\Digital_Music.jsonl', 'r', encoding='utf-8') as f:
+    with open(r'D:\ECOLE\PREPA MASTER\FALL2025\COMP6231 - Distributed System\New folder\data\Video_Games.jsonl', 'r', encoding='utf-8') as f:
         for i, line in enumerate(f, 1):
             try:
                 doc = json.loads(line)
                 yield {
-                    '_index': 'all-music-review',
+                    '_index': INDEX_NAME,
                     '_source': doc
                 }
                  
@@ -32,4 +43,4 @@ success, failed = helpers.bulk(es, read_and_index(), chunk_size=200, raise_on_er
 print(f"\nIngestion complete!")
 print(f"Successfully indexed: {success:,}")
 print(f"Failed: {failed}")
-print(f"Total in ES: {es.count(index='all-music-review')['count']:,}")
+print(f"Total in ES: {es.count(index=INDEX_NAME)['count']:,}")
