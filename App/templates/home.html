@@ -5,50 +5,54 @@
     <link rel="stylesheet" href="{{ url_for('static', filename='style.css') }}">
 </head>
 <body>
-    <div class = "top-bar">
+    <div class="page-container">
+        <div class = "top-bar">
+            
+            <form method="GET" action="/search" onsubmit="event.preventDefault(); runSearch();" class="search-bar">
+                <input id="query" type="text" placeholder="Search title or text..." size="40">
+                <button type="submit">Search</button>
+            </form>
+
+        </div>    
+
+        <hr>
         
-        <form method="GET" action="/search" onsubmit="event.preventDefault(); runSearch();" class="search-bar">
-            <input id="query" type="text" placeholder="Search title or text..." size="40">
-            <button type="submit">Search</button>
-        </form>
+        <div id="layout">
 
-    </div>    
-    <hr>
-    <div style="display:flex; align-items:flex-start;" id="filter-area">
+            <div class="filter-dropbar">
+                <button id="filter-toggle" style="
+                    width:100%; 
+                    padding:10px; 
+                    font-size:16px; 
+                    cursor:pointer;
+                ">
+                    Filters ▾
+                </button>
 
-        <div class="filter-dropbar">
-            <button id="filter-toggle" style="
-                width:100%; 
-                padding:10px; 
-                font-size:16px; 
-                cursor:pointer;
-            ">
-                Filters ▾
-            </button>
+                <div id="filters" class="filter-collapsed">
 
-            <div id="filters" class="filter-collapsed">
-
-                <label><b>Rating:</b></label><br>
-                    <select id="rating">
-                        <option value="">Any</option>
-                        <option value="5">5 ★</option>
-                        <option value="4">4 ★ & up</option>
-                        <option value="3">3 ★ & up</option>
-                    </select>
-                    <br><br>
-                <label><b>Sort by Price:</b></label><br>
-                    <select id="sort_price">
-                        <option value="">None</option>
-                        <option value="asc">Low → High</option>
-                        <option value="desc">High → Low</option>
-                    </select>
-                    <br><br>    
+                    <label><b>Rating:</b></label><br>
+                        <select id="rating">
+                            <option value="">Any</option>
+                            <option value="5">5 ★</option>
+                            <option value="4">4 ★ & up</option>
+                            <option value="3">3 ★ & up</option>
+                        </select>
+                        <br><br>
+                    <label><b>Sort by Price:</b></label><br>
+                        <select id="sort_price">
+                            <option value="">None</option>
+                            <option value="asc">Low → High</option>
+                            <option value="desc">High → Low</option>
+                        </select>
+                        <br><br>    
+                </div>
             </div>
+
+
+            <div id="results"></div>
         </div>
-
-
-        <div id="results"></div>
-    </div>
+    </div>    
     <script>
         async function runSearch() {
             const q = document.getElementById("query").value;

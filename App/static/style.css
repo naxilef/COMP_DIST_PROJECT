@@ -1,8 +1,12 @@
+.page-container {
+    max-width: 1200px;     
+    margin: 0 auto;       
+    padding: 0 20px;
+}
+
 .top-bar {
     display: flex;
-    justify-content: center;   /* centers horizontally */
-    margin-top: 20px;
-    margin-bottom: 20px;
+    justify-content: center;   
 }
 
 .search-bar {
@@ -10,8 +14,16 @@
     gap: 10px;
 }
 
+#layout {
+    display: flex;
+    align-items: flex-start;
+    justify-content: flex-start;
+    gap: 30px;        /* space between filter and results */
+}
+
 .filter-dropbar {
     display: none; 
+    width: 200px;
 }
 
 .filter-collapsed {
@@ -28,6 +40,10 @@
     border-right: 1px solid #ccc;
     background: #f7f7f7;
     font-size: 15px;
+}
+
+#results {
+    flex: 1;
 }
 
 .price-section {
