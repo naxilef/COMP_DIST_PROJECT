@@ -63,7 +63,7 @@
                 q,rating,price_order
             });
 
-            const res = await fetch(`/search?q=${params}`);
+            const res = await fetch(`/search?${params}`);
             const data = await res.json();
 
             document.querySelector(".filter-dropbar").style.display = "block";

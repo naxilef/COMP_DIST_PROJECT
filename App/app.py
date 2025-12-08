@@ -82,7 +82,7 @@ def search():
 
 @app.route("/item/<asin>")
 def item_page(asin):
-    return render_template("item.html")
+    return render_template("item.html", item=asin)
 
 if __name__ == '__main__':
     app.run()

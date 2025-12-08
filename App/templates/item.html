@@ -1,0 +1,30 @@
+<!DOCTYPE html>
+<html>
+<head>
+    <title>{{ item.title if item else 'Item Not Found' }}</title>
+    <link rel="stylesheet" href="{{ url_for('static', filename='style.css') }}">
+</head>
+
+<body>
+<div class="page-container">  <!-- SAME as home.html -->
+
+    <!-- SEARCH BAR -->
+    <div class="top-bar">
+        <form method="GET" action="/search">
+            <input type="text" name="q" placeholder="Search for another product..." required>
+            <button type="submit">Search</button>
+        </form>
+    </div> 
+
+    {% if not item %}
+        <h2>Item not found</h2>
+        <a href="/">← Back to search</a>
+        </div>
+    </body>
+    </html>
+    {% endif %}
+
+
+</div>
+</body>
+</html>
