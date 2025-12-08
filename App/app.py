@@ -90,6 +90,7 @@ def item_page(ID):
         return render_template("item.html", item=None)
 
     src = res["_source"]
+    asin = src.get("parent_asin")
 
     images = src.get("images") or []
     image = None
@@ -106,7 +107,7 @@ def item_page(ID):
     review_query = {
         "query": {
             "term": {
-                "asin": src.get("parent_asin")
+                "asin": asin
             }
         },
         "size": 20
@@ -118,7 +119,7 @@ def item_page(ID):
         review_query = {
             "query": {
                 "term": {
-                    "parent_asin.keyword": src.get("parent_asin")
+                    "parent_asin.keyword": asin
                 }
             },
             "size": 20
@@ -141,7 +142,26 @@ def item_page(ID):
             "timestamp": s.get("timestamp")
         })
 
-    return render_template("item.html", item=item, reviews=reviews)
+    base_url = "http://localhost:5601/app/dashboards#/view/951bc860-d455-11f0-b0a7-6f0cb27abf89?embed=true&_g=(refreshInterval:(pause:!t,value:60000),time:(from:now-15m,to:now))"
+    filter_part = (
+        "&_a=(filters:!("
+        "("
+            "meta:(alias:!n,disabled:!f,index:'video-game-reviews',key:asin,"
+            "negate:!f,params:(query:'{asin}'),type:phrase),"
+            "query:(match_phrase:(asin:'{asin}'))"
+        "),"
+        "("
+            "meta:(alias:!n,disabled:!f,index:'video-game-reviews',key:parent_asin,"
+            "negate:!f,params:(query:'{asin}'),type:phrase),"
+            "query:(match_phrase:(parent_asin:'{asin}'))"
+        ")"
+        "))&hide-filter-bar=true"
+    )
+
+    kibana_url = base_url + filter_part.format(asin=asin)
+
+
+    return render_template("item.html", item=item, reviews=reviews, kibana_url=kibana_url)
 
 if __name__ == '__main__':
     app.run()

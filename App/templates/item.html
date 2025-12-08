@@ -55,38 +55,48 @@
         </div>
     </div>
     <hr>
-    <div class="review-box">
-        <div class="label-tag">Reviews</div>
 
-        {% if reviews and reviews|length > 0 %}
-            {% for r in reviews %}
-                <div class="review-entry-box">
+    <div class="product-analytics-layout">
 
-                {% if r.title %}
-                    <div class="review-title">{{ r.title }}</div>
+        <div class="analytics-left">
+            <iframe src="{{ kibana_url }}" class="kibana-frame"></iframe>
+        </div>
+
+        <div class="analytics-right">
+            <div class="review-box">
+                <div class="label-tag">Reviews</div>
+
+                {% if reviews and reviews|length > 0 %}
+                    {% for r in reviews %}
+                        <div class="review-entry-box">
+
+                        {% if r.title %}
+                            <div class="review-title">{{ r.title }}</div>
+                        {% endif %}
+
+                        <div class="review-rating">Rating: {{ r.rating }} ★</div>
+
+                        <div class="review-text">{{ r.text }}</div>
+
+                        <div class="review-meta">
+                            <span class="review-user">{{ r.user }}</span>
+
+                            {% if r.verified %}
+                                <span class="verified">✔ Verified Purchase</span>
+                            {% endif %}
+
+                            {% if r.helpful %}
+                                <span class="helpful">Helpful: {{ r.helpful }}</span>
+                            {% endif %}
+                        </div>
+
+                        </div>
+                    {% endfor %}
+                {% else %}
+                    <p>No reviews available for this product.</p>
                 {% endif %}
-
-                <div class="review-rating">Rating: {{ r.rating }} ★</div>
-
-                <div class="review-text">{{ r.text }}</div>
-
-                <div class="review-meta">
-                    <span class="review-user">{{ r.user }}</span>
-
-                    {% if r.verified %}
-                        <span class="verified">✔ Verified Purchase</span>
-                    {% endif %}
-
-                    {% if r.helpful %}
-                        <span class="helpful">Helpful: {{ r.helpful }}</span>
-                    {% endif %}
-                </div>
-
-                </div>
-            {% endfor %}
-        {% else %}
-            <p>No reviews available for this product.</p>
-        {% endif %}
+            </div>
+        </div>
     </div>
     <hr>
 
