@@ -10,11 +10,13 @@
 
     <!-- SEARCH BAR -->
     <div class="top-bar">
-        <form method="GET" action="/search">
+        <form method="GET" action="/">
             <input type="text" name="q" placeholder="Search for another product..." required>
             <button type="submit">Search</button>
         </form>
     </div> 
+
+    <hr>
 
     {% if not item %}
         <h2>Item not found</h2>
@@ -24,6 +26,69 @@
     </html>
     {% endif %}
 
+    <div class="item-layout">
+        <div class="item-pic">
+            {% if item.image %}
+                <img src="{{ item.image }}">
+            {% else %}
+                <div>No image</div>
+            {% endif %}
+        </div>
+        <div class="item-info">
+            <div class="item-title">{{ item.title }}</div>
+
+            <div class="label-tag">Description</div>
+
+            <div class="item-desc">
+                {% if item.description %}
+                    {% if item.description is string %}
+                        {{ item.description }}
+                    {% else %}
+                        {% for d in item.description %}
+                            <p>{{ d }}</p>
+                        {% endfor %}
+                    {% endif %}
+                {% else %}
+                    No description available.
+                {% endif %}
+            </div>
+        </div>
+    </div>
+    <hr>
+    <div class="review-box">
+        <div class="label-tag">Reviews</div>
+
+        {% if reviews and reviews|length > 0 %}
+            {% for r in reviews %}
+                <div class="review-entry-box">
+
+                {% if r.title %}
+                    <div class="review-title">{{ r.title }}</div>
+                {% endif %}
+
+                <div class="review-rating">Rating: {{ r.rating }} ★</div>
+
+                <div class="review-text">{{ r.text }}</div>
+
+                <div class="review-meta">
+                    <span class="review-user">{{ r.user }}</span>
+
+                    {% if r.verified %}
+                        <span class="verified">✔ Verified Purchase</span>
+                    {% endif %}
+
+                    {% if r.helpful %}
+                        <span class="helpful">Helpful: {{ r.helpful }}</span>
+                    {% endif %}
+                </div>
+
+                </div>
+            {% endfor %}
+        {% else %}
+            <p>No reviews available for this product.</p>
+        {% endif %}
+    </div>
+    <hr>
 
 </div>
 </body>

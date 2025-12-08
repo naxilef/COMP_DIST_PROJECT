@@ -1,7 +1,7 @@
 from flask import Flask, jsonify, render_template, request
 from elasticsearch import Elasticsearch
 
-INDEX_NAME = "all-digital-music-products"
+INDEX_NAME = "video-game-products"
 
 app = Flask(__name__)
 
@@ -69,20 +69,79 @@ def search():
 
     hits = [
         {
+            "ID": h["_id"],
             "title": h["_source"].get("title"),
             "asin": h["_source"].get("parent_asin"),
             "rating": h["_source"].get("average_rating"),
             "image": (h["_source"].get("images") or [{}])[0].get("thumb"),
             "price": h["_source"].get("price")
+            
         }
         for h in response["hits"]["hits"]
     ]
     
     return jsonify(hits)
 
-@app.route("/item/<asin>")
-def item_page(asin):
-    return render_template("item.html", item=asin)
+@app.route("/item/<ID>")
+def item_page(ID):
+    try:
+        res = es.get(index=INDEX_NAME, id=ID)
+    except Exception:
+        return render_template("item.html", item=None)
+
+    src = res["_source"]
+
+    images = src.get("images") or []
+    image = None
+    if images and isinstance(images, list):
+        image = images[0].get("large") or images[0].get("thumb")
+
+    item = {
+        "ID": ID,
+        "title": src.get("title", "Untitle"),
+        "description": src.get("description"),
+        "image": image
+    }
+
+    review_query = {
+        "query": {
+            "term": {
+                "asin": src.get("parent_asin")
+            }
+        },
+        "size": 20
+    }
+
+    review_res = es.search(index="video-game-reviews", body=review_query)
+
+    if len(review_res["hits"]["hits"]) == 0:
+        review_query = {
+            "query": {
+                "term": {
+                    "parent_asin.keyword": src.get("parent_asin")
+                }
+            },
+            "size": 20
+        }
+        review_res = es.search(index="video-game-reviews", body=review_query)
+    
+
+    # Format reviews
+    reviews = []
+    for r in review_res["hits"]["hits"]:
+        s = r["_source"]
+
+        reviews.append({
+            "user": s.get("user_id", "Anonymous"),
+            "rating": s.get("rating", "N/A"),
+            "text": s.get("text") or "",
+            "title": s.get("title", ""),
+            "helpful": s.get("helpful_vote", 0),
+            "verified": s.get("verified_purchase", False),
+            "timestamp": s.get("timestamp")
+        })
+
+    return render_template("item.html", item=item, reviews=reviews)
 
 if __name__ == '__main__':
     app.run()

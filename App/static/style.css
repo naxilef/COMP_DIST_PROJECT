@@ -53,3 +53,92 @@
     font-weight: bold;
     color: #444;
 }
+
+.item-layout {
+    display: flex;
+    gap: 40px;
+    align-items: flex-start;
+    margin-top: 30px;
+    margin-bottom: 50px;
+}
+
+.item-pic img {
+    width: 260px;
+    border: 1px solid #ccc;
+    padding: 6px;
+    border-radius: 6px;
+    background: #fafafa;
+}
+
+.item-info {
+    flex: 1;
+}
+
+.item-title {
+    font-size: 26px;
+    font-weight: bold;
+    margin-bottom: 20px;
+}
+
+.label-tag {
+    font-size: 20px;
+    font-weight: bold;
+    margin-bottom: 10px;
+    text-align: center;
+}
+
+.item-desc {
+    background: #f9f9f9;
+    border: 1px solid #ddd;
+    padding: 18px;
+    border-radius: 6px;
+    font-size: 16px;
+    line-height: 1.55;
+    max-width: 700px;
+}
+
+.review-entry-box {
+    background: #ffffff;
+    border: 1px solid #ddd;
+    padding: 18px;
+    border-radius: 6px;
+    margin-bottom: 20px;
+    max-width: 700px;              
+    margin-left: auto;
+    margin-right: auto;            
+    box-shadow: 0 1px 3px rgba(0,0,0,0.05);
+}
+
+.review-entry-box:last-child {
+    margin-bottom: 0;
+}
+
+/* Title of the review */
+.review-title {
+    font-weight: bold;
+    font-size: 17px;
+    margin-bottom: 5px;
+}
+
+/* Rating inside box */
+.review-rating {
+    color: #e6a800;
+    font-size: 15px;
+    margin-bottom: 8px;
+}
+
+.review-meta {
+    font-size: 13px;
+    color: #666;
+    margin-top: 8px;
+}
+
+.verified {
+    color: #0a7d00;
+    margin-left: 10px;
+}
+
+.helpful {
+    margin-left: 10px;
+    color: #444;
+}
