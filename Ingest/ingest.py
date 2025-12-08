@@ -48,7 +48,7 @@ def extract_tags(text):
 
 
 def read_and_index():
-    with open(r'D:\ECOLE\PREPA MASTER\FALL2025\COMP6231 - Distributed System\New folder\data\Video_Games.jsonl', 'r', encoding='utf-8') as f:
+    with open(r'..\data\Video_Games.jsonl', 'r', encoding='utf-8') as f:
         for i, line in enumerate(f, 1):
             try:
                 doc = json.loads(line)

@@ -8,7 +8,7 @@ load_dotenv()
 ES_USER = "elastic" 
 ES_HOST = "https://localhost:9200"
 INDEX_NAME = "video-game-products"
-JSON_FILE = r"D:\ECOLE\PREPA MASTER\FALL2025\COMP6231 - Distributed System\New folder\data\meta_Video_Games.jsonl" #put complete path to data
+JSON_FILE = r"..\data\meta_Video_Games.jsonl" #put complete path to data
 
 
 es = Elasticsearch(
