@@ -2,6 +2,7 @@ from flask import Flask, jsonify, render_template, request
 from elasticsearch import Elasticsearch
 
 INDEX_NAME = "video-game-products"
+DASHBOARD_ID = "d82dc7f0-d470-11f0-8b21-657c1ad5fc00"
 
 app = Flask(__name__)
 
@@ -142,7 +143,8 @@ def item_page(ID):
             "timestamp": s.get("timestamp")
         })
 
-    base_url = "http://localhost:5601/app/dashboards#/view/d82dc7f0-d470-11f0-8b21-657c1ad5fc00?embed=true&_g=(refreshInterval:(pause:!t,value:60000),time:(from:now-15m,to:now))"
+    base_url = (f"http://localhost:5601/app/dashboards#/view/{DASHBOARD_ID}"
+                "?embed=true&_g=(refreshInterval:(pause:!t,value:60000),time:(from:now-15m,to:now))")
     filter_part = (
         "&_a=(filters:!("
         "("
