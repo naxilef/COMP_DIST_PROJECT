@@ -12,7 +12,7 @@ Dataset ingesting:
 1. Create a virtual environment
 2. install requirement with the requirement.txt file using pip install -r requirements.txt
 3. run nltk_download.py to download the stopword, tokeniser
-4. make sure the dataset in data folder is named correctly, meta_Video_Games.jsonl for the product and Video_Games.jsonl for the  review: dataset available at {link}
+4. make sure the dataset in data folder is named correctly, meta_Video_Games.jsonl for the product and Video_Games.jsonl for the  review: dataset available at {https://amazon-reviews-2023.github.io/ under the video-game section you can download review and meta}
 5. start the containers with docker-compose up -d when in project directory
 6. cd in Ingest, run python ingest.py and python ingest_file.py for ingesting the dataset in Elasticsearch
 
